@@ -1,0 +1,20 @@
+services:
+  voicevox:
+    image: voicevox/voicevox_engine:cpu-ubuntu20.04-latest
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:50021"]
+      interval: 5s
+      timeout: 5s
+      retries: 1
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - VOICEVOX_URL=http://voicevox:50021
+    depends_on:
+      voicevox:
+        condition: service_healthy

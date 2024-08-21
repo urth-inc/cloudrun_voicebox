@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VOICEVOX TTS</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      form {
+        margin-bottom: 20px;
+      }
+      textarea {
+        width: 100%;
+        height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>VOICEVOX テキスト読み上げ</h1>
+    <p>
+      <a href="https://voicevox.hiroshiba.jp/">VOICEVOX</a
+      >を使ってテキストを読み上げるサービスです。
+    </p>
+    <form id="ttsForm">
+      <textarea
+        name="text"
+        placeholder="ここにテキストを入力してください"
+        required
+      ></textarea>
+      <select id="speakerSelect" name="speaker" required>
+        <option value="">話者を選択してください</option>
+        <!-- SPEAKER_OPTIONS -->
+      </select>
+      <button type="submit">音声生成</button>
+    </form>
+    <audio id="audioPlayer" controls style="display: none"></audio>
+
+    <script>
+      document
+        .getElementById("ttsForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const text = e.target.text.value;
+          const speakerId = e.target.speaker.value;
+          const response = await fetch(
+            `/tts?text=${encodeURIComponent(
+              text
+            )}&speakerId=${encodeURIComponent(speakerId)}`
+          );
+          const audioBlob = await response.blob();
+          const audioUrl = URL.createObjectURL(audioBlob);
+          const audioPlayer = document.getElementById("audioPlayer");
+          audioPlayer.src = audioUrl;
+          audioPlayer.style.display = "block";
+        });
+    </script>
+  </body>
+</html>
