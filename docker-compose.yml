@@ -3,9 +3,9 @@ services:
     image: voicevox/voicevox_engine:cpu-ubuntu20.04-latest
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:50021"]
-      interval: 5s
+      start_period: 3s
+      interval: 60s
       timeout: 5s
-      retries: 1
 
   app:
     build:
