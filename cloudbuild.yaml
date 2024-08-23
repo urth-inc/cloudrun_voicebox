@@ -1,0 +1,38 @@
+steps:
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: "gcloud"
+    args: ["config", "set", "run/region", "${_REGION}"]
+
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        if ! gcloud artifacts repositories describe ${_REPOSITORY} --location ${_REGION}; then
+          gcloud artifacts repositories create ${_REPOSITORY} --repository-format=docker ----location ${_REGION} --description="Docker repository for cloudrun-voicevox app"
+        else
+          echo "Repository already exists."
+        fi
+
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: docker
+    args:
+      [
+        "build",
+        "-t",
+        "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/app",
+        ".",
+      ]
+    dir: "."
+
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: docker
+    args: ["push", "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/app"]
+
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: "gcloud"
+    args: ["run", "services", "replace", "service.yaml"]
+
+substitutions:
+  _REGION: "asia-northeast1"
+  _REPOSITORY: cloudrun-voicevox

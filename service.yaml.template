@@ -1,0 +1,29 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: ${SERVICE_NAME}
+  annotations:
+    run.googleapis.com/launch-stage: BETA
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/container-dependencies: "{app:[voicevox]}"
+    spec:
+      containers:
+        - image: ${REGION}-docker.pkg.dev/${PROJECT_ID}/cloudrun-voicevox/app
+          name: app
+          ports:
+            - containerPort: ${CONTAINER_PORT}
+          env:
+            - name: "VOICEVOX_URL"
+              value: "http://localhost:50021"
+        - image: voicevox/voicevox_engine:cpu-ubuntu20.04-latest
+          name: voicevox
+          startupProbe:
+            initialDelaySeconds: 3
+            periodSeconds: 60
+            failureThreshold: 5
+            httpGet:
+              path: /
+              port: 50021
