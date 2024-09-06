@@ -13,12 +13,9 @@ http://localhost:3000/ にアクセスしてください。
 
 ## CloudRunにデプロイする
 ```sh
-./gen_service_yaml.sh
+./scripts/gen_service_yaml.sh
 ./scripts/deploy.sh
 ```
-
-
-
 
 ## ソフトウェア構成
 * 音声合成
